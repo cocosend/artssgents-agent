@@ -2,6 +2,8 @@ import { betterAuth } from "better-auth";
 
 const SESSION_MAX_AGE_SECONDS = 8 * 60 * 60;
 const DEVELOPMENT_ALLOWED_HOSTS = ["localhost:*", "127.0.0.1:*"];
+// Explicitly allow both verified production aliases of the artssgents Vercel project.
+const PRODUCTION_ALLOWED_HOSTS = ["artssgents.vercel.app", "artssgents-artssby-apps.vercel.app"];
 
 function getAllowedHosts(): string[] {
   if (process.env.NODE_ENV === "development") {
@@ -15,7 +17,7 @@ function getAllowedHosts(): string[] {
   if (deploymentHosts.length === 0) {
     throw new Error("No trusted deployment hosts are configured");
   }
-  return Array.from(new Set(deploymentHosts));
+  return Array.from(new Set([...deploymentHosts, ...PRODUCTION_ALLOWED_HOSTS]));
 }
 
 function requireEnvironmentVariable(name: string): string {
