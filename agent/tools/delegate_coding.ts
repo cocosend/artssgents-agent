@@ -28,7 +28,7 @@ export default defineTool({
       redirect: "error",
       signal: AbortSignal.timeout(110_000),
     });
-    const data = await response.json() as {
+    const data = await response.json().catch(() => ({ error: "Non-JSON backend response" })) as {
       error?: string;
       text?: string;
       action?: string;
@@ -41,7 +41,16 @@ export default defineTool({
       contributors?: string[];
     };
     if (!response.ok) {
-      throw new Error(`ARTSS coding engine HTTP ${response.status}: ${(data.error || "Request failed").slice(0, 300)}`);
+      // A blocked backend is not an Eve tool-loop crash. Let Eve explain the
+      // status and, for read-only requests, provide a local analysis instead.
+      // Never claim that an apply task committed changes on this path.
+      return {
+        action: "blocked",
+        provider,
+        text: `ARTSS coding engine HTTP ${response.status}: ${(data.error || "Request failed").slice(0, 300)}. No repository changes were made by this call.`,
+        files: [] as string[],
+        mode,
+      };
     }
     return {
       action: data.action || "unknown",
