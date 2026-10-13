@@ -1,5 +1,7 @@
-import { AuthenticatedAgentChat } from "./_components/authenticated-agent-chat";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <AuthenticatedAgentChat />;
+  // ARTSS ONE is the single user-facing workspace. Eve's authenticated
+  // conversation interface is retained at /legacy for existing sessions.
+  redirect("https://artssapp-agent-artssby-apps.vercel.app/");
 }
